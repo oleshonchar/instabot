@@ -3,6 +3,7 @@ from telegram_bot.models import Authentication
 from django.core.exceptions import ObjectDoesNotExist
 from api import InstagramAPI
 import logging
+import time
 
 
 logger = logging.getLogger(__name__)
@@ -36,3 +37,20 @@ class InstaBot(object):
                 return False
         return user_id_list
 
+    def get_photo_id(self, *username_list):
+        photo_list = list()
+        user_id_list = self.get_user_id(*username_list)
+        if user_id_list:
+            for user_id in user_id_list:
+                user_feed = self.api.getUserFeed(user_id)
+                if not user_feed:
+                    logger.info('Ошибка: пользователь не найден или доступ закрыт')
+                    return False
+                pictures = self.api.LastJson['items']
+                for picture in pictures:
+                    photo_list.append(int(picture['pk']))
+                time.sleep(5)
+            return photo_list
+        else:
+            logger.info('Ошибка: страница недоступна')
+            return False
