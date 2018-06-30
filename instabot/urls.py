@@ -1,9 +1,7 @@
 from django.contrib import admin
-from django.urls import path
-from telegram_bot import views
-from .settings import TG_TOKEN
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('bot/{}'.format(TG_TOKEN), views.CommandReceiveView.as_view(), name='webhook'),
+    path('', include(('telegram_bot.urls', 'telegram_bot'), namespace='tg_bot'))
 ]

@@ -1,23 +1,45 @@
-from rest_framework.generics import CreateAPIView
-from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
-from telebot.types import Update
-from telegram_bot import bot
-from instagram_bot.views import *
+from django.http import HttpResponseForbidden, JsonResponse, HttpResponseBadRequest
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views import View
+from threading import Thread
+import json
+
+from config import TG_TOKEN
+from .bot import TgBotHandler
 
 
-class CommandReceiveView(CreateAPIView):
-    def post(self, request, *args, **kwargs):
-
-        if len(request.data) == 0:
-            return Response({'error': 'no data'}, status=HTTP_400_BAD_REQUEST)
-
-        update = Update.de_json(request.data)
-        bot.process_new_updates([update])
-
-        return Response({'status': 'OK'}, status=HTTP_200_OK)
+tg_bot = TgBotHandler()
 
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    test = InstaBot(1)
+class CommandReceiveView(View):
+    def post(self, request, bot_token):
+
+        if bot_token != TG_TOKEN:
+            return HttpResponseForbidden('Invalid token')
+
+        commands = {
+            '/parse': tg_bot.parse_users,
+        }
+
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except ValueError:
+            return HttpResponseBadRequest('Invalid request body')
+        else:
+            chat_id = data['message']['chat']['id']
+            cmd = data['message'].get('text')
+            func = commands.get(cmd.split()[0].lower())
+
+            if func:
+                tg_bot.send_message(chat_id, 'Function was activated')
+                t = Thread(target=func, args=(chat_id,))
+                t.start()
+            else:
+                tg_bot.send_message(chat_id, 'I do not understand you!')
+
+        return JsonResponse({}, status=200)
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CommandReceiveView, self).dispatch(request, *args, **kwargs)
