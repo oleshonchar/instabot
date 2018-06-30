@@ -112,6 +112,44 @@ class InstaBot(object):
                 count += 1
         return 'Successful liked: {}, unsuccessful liked: {}'.format(done, error)
 
+    def follow(self, user_id, number_of_users):
+        data = Profile.objects.filter(user_id=user_id, follow='')[:number_of_users]
+        done = 0
+        error = 0
+
+        for username in data:
+            user_id = self.get_user_id(username)
+            if user_id:
+                self.api.follow(user_id[0])
+                print(str(username) + ' | follow')
+                Profile.objects.filter(username=username).update(follow='follow')
+                done += 1
+                time.sleep(35)
+            else:
+                Profile.objects.filter(username=username).update(follow='error')
+                error += 1
+                continue
+        return 'Successful subscriptions: {}, unsuccessful subscriptions: {}'.format(done, error)
+
+    def unfollow(self, user_id, number_of_users):
+        data = Profile.objects.filter(user_id=user_id, follow='follow')[:number_of_users]
+        done = 0
+        error = 0
+
+        for username in data:
+            user_id = self.get_user_id(username)
+            if user_id:
+                self.api.unfollow(user_id[0])
+                print(str(username) + ' | unfollow')
+                Profile.objects.filter(username=username).update(follow='unfollow')
+                done += 1
+                time.sleep(35)
+            else:
+                Profile.objects.filter(username=username).update(follow='error')
+                error += 1
+                continue
+        return 'Successful cancel subscriptions: {}, unsuccessful cancel subscriptions: {}'.format(done, error)
+
 
 def save_usernames(username_list, user_id):
     for username in username_list:

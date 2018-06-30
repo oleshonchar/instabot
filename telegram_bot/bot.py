@@ -26,3 +26,9 @@ class TgBotHandler(object):
 
     def like_handler(self, *args):
         self.insta_bot.like(self.user.id, 5)
+
+    def follow_handler(self, *args):
+        self.insta_bot.follow(self.user.id, 5)
+
+    def unfollow_handler(self, *args):
+        self.insta_bot.unfollow(self.user.id, 5)

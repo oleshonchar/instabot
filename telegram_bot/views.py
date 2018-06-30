@@ -27,6 +27,8 @@ class CommandReceiveView(View):
             commands = {
                 '/parse': tg_bot.parse_users_handler,
                 '/like': tg_bot.like_handler,
+                '/follow': tg_bot.follow_handler,
+                '/unfollow': tg_bot.unfollow_handler,
             }
 
             func = commands.get(cmd.split()[0].lower())
