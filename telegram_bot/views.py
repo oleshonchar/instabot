@@ -37,14 +37,18 @@ class CommandReceiveView(View):
 
             commands = {
                 '/parse': tg_bot.parse_users_handler,
-                '/like': tg_bot.like_handler,
-                '/follow': tg_bot.follow_handler,
-                '/unfollow': tg_bot.unfollow_handler,
+                '/liking': tg_bot.get_confirmation,
+                '/following': tg_bot.get_confirmation,
+                '/unfollowing': tg_bot.get_confirmation,
                 '/start': tg_bot.start_handler,
                 'sign': tg_bot.sign_in,
                 'accept': tg_bot.register_instagram_account,
                 'login:': tg_bot.save_login_password,
                 'password:': tg_bot.save_login_password,
+                'liking_accept': tg_bot.router,
+                'liking_cancel': tg_bot.router,
+                'following_accept': tg_bot.router,
+                'following_cancel': tg_bot.router,
             }
 
             if callback:
