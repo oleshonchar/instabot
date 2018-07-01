@@ -20,21 +20,40 @@ class CommandReceiveView(View):
         except ValueError:
             return HttpResponseBadRequest('Invalid request body')
         else:
-            chat_id = data['message']['chat']['id']
-            cmd = data['message'].get('text')
-            tg_bot = TgBotHandler(chat_id)
+            # TODO: переписати try, exept на зрозумілішу логіку
+            # Зараз: по кліку на інлайн-кнопку приходить інший об'єкт
+            try:
+                chat_id = data['message']['chat']['id']
+                cmd = data['message'].get('text')
+                username = data['message']['from']['first_name'] + ' ' + data['message']['from']['last_name']
+                callback = False
+            except KeyError:
+                callback = data['callback_query']['data']
+                chat_id = data['callback_query']['from']['id']
+                username = data['callback_query']['from']['first_name'] + ' ' + data['callback_query']['from']['last_name']
+                cmd = False
+
+            tg_bot = TgBotHandler(chat_id, username)
 
             commands = {
                 '/parse': tg_bot.parse_users_handler,
                 '/like': tg_bot.like_handler,
                 '/follow': tg_bot.follow_handler,
                 '/unfollow': tg_bot.unfollow_handler,
+                '/start': tg_bot.start_handler,
+                'sign': tg_bot.sign_in,
+                'accept': tg_bot.register_instagram_account,
+                'login:': tg_bot.save_login_password,
+                'password:': tg_bot.save_login_password,
             }
 
-            func = commands.get(cmd.split()[0].lower())
+            if callback:
+                func = commands.get(str(callback))
+            else:
+                func = commands.get(cmd.split()[0].lower())
+
             if func:
-                tg_bot.send_message(chat_id, 'Function was activated')
-                t = Thread(target=func, args=(chat_id,))
+                t = Thread(target=func, args=(chat_id, data,))
                 t.start()
             else:
                 tg_bot.send_message(chat_id, 'I do not understand you!')
