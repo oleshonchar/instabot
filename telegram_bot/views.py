@@ -41,6 +41,7 @@ class CommandReceiveView(View):
                 '/following': tg_bot.get_confirmation,
                 '/unfollowing': tg_bot.get_confirmation,
                 '/start': tg_bot.start_handler,
+                '/whitelist': tg_bot.whilelist,
                 'sign': tg_bot.sign_in,
                 'accept': tg_bot.register_instagram_account,
                 'login:': tg_bot.save_login_password,

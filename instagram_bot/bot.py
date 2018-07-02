@@ -5,7 +5,7 @@ import random
 
 from api import InstagramAPI
 from telegram_bot.models import Authentication
-from .models import Profile
+from .models import Profile, Whitelist
 
 
 logger = logging.getLogger(__name__)
@@ -149,6 +149,13 @@ class InstaBot(object):
                 error += 1
                 continue
         return 'Successful cancel subscriptions: {}, unsuccessful cancel subscriptions: {}'.format(done, error)
+
+    def create_whitelist(self, chat_id):
+        user = Authentication.objects.get(user_id=chat_id)
+        user_id = self.get_user_id(user.login)
+        followers = self.api.getTotalFollowings(user_id[0])
+        for username in followers:
+            Whitelist.objects.get_or_create(user_id=user, username=username['username'])
 
 
 def save_usernames(username_list, user_id):

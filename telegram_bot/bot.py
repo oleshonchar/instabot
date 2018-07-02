@@ -145,6 +145,10 @@ class TgBotHandler(object):
         return datetime.datetime.strptime(time.ctime(time.time() + seconds), "%a %b %d %H:%M:%S %Y").strftime(
             "%H:%M:%S")
 
+    def whilelist(self, chat_id, data):
+        self.insta_bot.create_whitelist(chat_id)
+        self.send_message(chat_id, 'Whitelist was created')
+
     def start_handler(self, chat_id, data):
         button_text = 'Sign in'
         text = 'Hello, {}'.format(self.user.username)

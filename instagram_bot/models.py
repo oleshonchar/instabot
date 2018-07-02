@@ -15,3 +15,15 @@ class Profile(models.Model):
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'
+
+
+class Whitelist(models.Model):
+    user_id = models.ForeignKey('telegram_bot.Authentication', on_delete=models.CASCADE, default=None)
+    username = models.CharField(max_length=100)
+
+    def __str__(self):
+        return str(self.username)
+
+    class Meta:
+        verbose_name = 'Белый список'
+        verbose_name_plural = 'Белый список'
