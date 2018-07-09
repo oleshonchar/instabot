@@ -50,6 +50,8 @@ class CommandReceiveView(View):
                 'liking_cancel': tg_bot.router,
                 'following_accept': tg_bot.router,
                 'following_cancel': tg_bot.router,
+                'unfollowing_accept': tg_bot.router,
+                'unfollowing_cancel': tg_bot.router,
             }
 
             if callback:

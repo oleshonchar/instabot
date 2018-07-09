@@ -1,14 +1,14 @@
 from django.db import models
 
 
-class Authentication(models.Model):
+class TgUser(models.Model):
     user_id = models.IntegerField(default=None)
     username = models.CharField(max_length=50, blank=True)
     login = models.CharField(max_length=50)
     password = models.CharField(max_length=50)
 
     def __str__(self):
-        return str(self.user_id)
+        return str(self.username)
 
     class Meta:
         verbose_name = 'Instagram профиль пользователя'

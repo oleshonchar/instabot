@@ -2,10 +2,11 @@ from django.db import models
 
 
 class Profile(models.Model):
-    user_id = models.ForeignKey('telegram_bot.Authentication', on_delete=models.CASCADE, default=None)
+    tg_user = models.ForeignKey('telegram_bot.TgUser', on_delete=models.CASCADE)
     username = models.CharField(max_length=100)
-    like = models.CharField(max_length=50)
-    follow = models.CharField(max_length=50)
+    like = models.NullBooleanField()
+    follow = models.NullBooleanField()
+    unfollow = models.NullBooleanField()
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
@@ -18,7 +19,7 @@ class Profile(models.Model):
 
 
 class Whitelist(models.Model):
-    user_id = models.ForeignKey('telegram_bot.Authentication', on_delete=models.CASCADE, default=None)
+    tg_user = models.ForeignKey('telegram_bot.TgUser', on_delete=models.CASCADE)
     username = models.CharField(max_length=100)
 
     def __str__(self):
