@@ -3,7 +3,8 @@ import logging
 import time
 import random
 
-from api import InstagramAPI
+from InstagramAPI import InstagramAPI
+
 from telegram_bot.models import TgUser
 from .models import Profile, Whitelist
 import telegram_bot.bot
