@@ -6,6 +6,7 @@ import random
 from api import InstagramAPI
 from telegram_bot.models import TgUser
 from .models import Profile, Whitelist
+import telegram_bot.bot
 
 
 logger = logging.getLogger(__name__)
@@ -16,13 +17,14 @@ class InstaBot(object):
     def __init__(self, user_id, max_followers=500, max_profile_count=20):
         self.is_logged_in = False
         self.api = self.login(user_id)
-        login_status = self.api.login()
-        self.max_followers = max_followers
-        self.max_profile_count = max_profile_count
-        if login_status is True:
-            self.is_logged_in = True
-        else:
-            print('Ошибка: некорректный ввод instagram данных')
+        if self.api:
+            login_status = self.api.login()
+            self.max_followers = max_followers
+            self.max_profile_count = max_profile_count
+            if login_status is True:
+                self.is_logged_in = True
+            else:
+                print('Ошибка: некорректный ввод instagram данных')
 
     @staticmethod
     def login(user_id):
@@ -32,8 +34,14 @@ class InstaBot(object):
             return False
         else:
             login = data.login
-            password = data.password
-            return InstagramAPI(login, password)
+            password = data.hash
+            salt = data.salt
+            password = telegram_bot.bot.decrypt(password, salt)
+            if not password:
+                print('Ошибка авторизации')
+                return False
+            else:
+                return InstagramAPI(login, password)
 
     def get_user_id(self, *username_list):
         user_id_list = list()

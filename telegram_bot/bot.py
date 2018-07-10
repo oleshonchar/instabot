@@ -1,7 +1,11 @@
+import string
 import requests
 import json
 import datetime
 import time
+import random
+
+import rncryptor
 
 from telegram_bot import url
 from telegram_bot.models import TgUser
@@ -45,7 +49,7 @@ class TgBotHandler(object):
         return response
 
     def sign_in(self, user_id, data):
-        if self.user.login or self.user.password:
+        if self.user.login and self.user.hash:
             text = 'Successful login'
             self.reply_keyboard(user_id, text, remove_keyboard=True)
         else:
@@ -69,12 +73,11 @@ class TgBotHandler(object):
             key = message_text.split(':')[0]
             value = message_text.split(':')[1].replace(' ', '')
             if value:
-                # TODO: як передать вміст змінної як аргумент функції?
-                # TgUser.objects.filter(user_id=user_id).update(key=value)
                 if key == 'login':
                     TgUser.objects.filter(user_id=user_id).update(login=value)
                 elif key == 'password':
-                    TgUser.objects.filter(user_id=user_id).update(password=value)
+                    value, salt = encrypt(value)
+                    TgUser.objects.filter(user_id=user_id).update(hash=value, salt=salt)
                 self.send_message(user_id, text='{} accepted'.format(key))
             else:
                 self.send_message(user_id, text='Input error')
@@ -185,3 +188,23 @@ class TgBotHandler(object):
             return False
         else:
             return True
+
+
+def generate_key(size=30):
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def encrypt(data):
+    password = generate_key()
+    encrypted_data = rncryptor.encrypt(data, password)
+    return encrypted_data, password
+
+
+def decrypt(data, password):
+    try:
+        decrypted_data = rncryptor.decrypt(data, password)
+    except:
+        print('Некорректный ввод')
+        return False
+    return decrypted_data
