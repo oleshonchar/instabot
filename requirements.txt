@@ -6,7 +6,7 @@ idna==2.6
 imageio==2.1.2
 InstagramAPI==1.0.2
 moviepy==0.2.3.2
-numpy==1.14.5
+numpy==1.22.0
 Pillow==5.2.0
 pycrypto==2.6.1
 pytz==2018.4
